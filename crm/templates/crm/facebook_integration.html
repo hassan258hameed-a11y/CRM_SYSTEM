@@ -1,0 +1,132 @@
+{% extends "crm/base.html" %}
+
+{% block title %}Facebook Integration{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold text-gray-800">Facebook Integration</h1>
+        <span class="text-sm text-gray-500">
+            Total Facebook leads: {{ stats.total_fb_leads }}
+        </span>
+    </div>
+
+    <!-- Webhook URL card -->
+    <div class="bg-white rounded-2xl shadow p-6 space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800">Webhook URL</h2>
+        <p class="text-sm text-gray-600">
+            Use this URL in Zapier / Make / Facebook Lead Ads when sending leads to your CRM.
+        </p>
+
+        <div class="flex items-center space-x-2">
+            <input
+                type="text"
+                readonly
+                value="{{ webhook_url }}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-gray-50"
+            >
+            <button
+                type="button"
+                class="px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700"
+                onclick="navigator.clipboard.writeText('{{ webhook_url|escapejs }}')"
+            >
+                Copy
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl shadow p-5">
+            <p class="text-sm text-gray-500">Total Facebook leads</p>
+            <p class="mt-2 text-2xl font-semibold text-gray-800">
+                {{ stats.total_fb_leads }}
+            </p>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-5">
+            <p class="text-sm text-gray-500">New in last 30 days</p>
+            <p class="mt-2 text-2xl font-semibold text-gray-800">
+                {{ stats.last_30_days }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Leads table -->
+    <div class="bg-white rounded-2xl shadow p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Facebook Leads</h2>
+            <span class="text-xs text-gray-500">
+                Showing {{ fb_leads|length }} lead{{ fb_leads|length|pluralize }}
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="border-b bg-gray-50 text-gray-700">
+                    <tr>
+                        <th class="px-3 py-2 text-left">#</th>
+                        <th class="px-3 py-2 text-left">Phone</th>
+                        <th class="px-3 py-2 text-left">Email</th>
+                        <th class="px-3 py-2 text-left">Student</th>
+                        <th class="px-3 py-2 text-left">Campaign</th>
+                        <th class="px-3 py-2 text-left">Ad Set</th>
+                        <th class="px-3 py-2 text-left">Ad Name</th>
+                        <th class="px-3 py-2 text-left">Received</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if fb_leads %}
+                        {% for lead in fb_leads %}
+                        <tr class="border-b last:border-b-0 hover:bg-gray-50">
+                            <td class="px-3 py-2">{{ forloop.counter }}</td>
+                            <td class="px-3 py-2">{{ lead.phone|default:"—" }}</td>
+                            <td class="px-3 py-2">{{ lead.email|default:"—" }}</td>
+                            <td class="px-3 py-2">
+                                {% if lead.student %}
+                                    <a href="{% url 'student_detail' lead.student.pk %}"
+                                       class="text-indigo-600 hover:underline">
+                                        {{ lead.student.first_name }} {{ lead.student.last_name }}
+                                    </a>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td class="px-3 py-2">{{ lead.campaign_name|default:"—" }}</td>
+                            <td class="px-3 py-2">{{ lead.adset_name|default:"—" }}</td>
+                            <td class="px-3 py-2">{{ lead.ad_name|default:"—" }}</td>
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ lead.created_at|date:"Y-m-d H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="px-3 py-6 text-center text-gray-500">
+                                No Facebook leads yet. Once your ad is live and sending to the webhook URL above,
+                                new leads will appear here automatically.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Help / instructions -->
+    <div class="bg-white rounded-2xl shadow p-6 space-y-3">
+        <h2 class="text-xl font-semibold text-gray-800">How this integration works</h2>
+        <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+            <li>Create a Facebook Lead Ad (e.g. “Apply for September Intake”).</li>
+            <li>Use Zapier / Make / similar: trigger <strong>Facebook Lead Ads → New Lead</strong>.</li>
+            <li>In the action step, send a <strong>POST JSON</strong> request to the webhook URL above.</li>
+            <li>Include fields like <code>full_name</code>, <code>email</code>, <code>phone</code>, 
+                <code>course</code>, <code>country</code>, and an optional <code>facebook</code> object 
+                with campaign / ad info.</li>
+            <li>Each new lead will automatically create / link a Student and appear in this list.</li>
+        </ol>
+    </div>
+
+</div>
+{% endblock %}

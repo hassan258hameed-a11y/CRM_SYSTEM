@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Database
+db.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Media uploads
+media/
+
+# Virtual environment
+venv/
+
+# ZIP files (so CRM_SYSTEM.zip never uploads)
+*.zip
+
+# System files
+*.log
+*.tmp

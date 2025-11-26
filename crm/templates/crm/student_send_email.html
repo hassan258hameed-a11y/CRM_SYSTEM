@@ -1,0 +1,44 @@
+{% extends "crm/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-10">
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-3xl p-8 border border-purple-100">
+    <h2 class="text-2xl font-bold text-purple-700 mb-2">
+      Send Email to {{ student.first_name }} {{ student.last_name }}
+    </h2>
+    <p class="text-gray-500 mb-6">
+      {{ student.email }}
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Subject</label>
+        {{ form.subject }}
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Message</label>
+        {{ form.body }}
+        <p class="text-xs text-gray-400 mt-1">
+          You can use <code>{{ "{{ first_name }}" }}</code> to insert the student's first name.
+        </p>
+      </div>
+
+      <div class="mb-6 flex items-center space-x-2">
+        {{ form.include_documents }}
+        <label class="text-sm text-gray-700">
+          {{ form.include_documents.label }}
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        class="px-6 py-2 rounded-full bg-purple-600 text-white font-semibold shadow hover:bg-purple-700 transition"
+      >
+        Send Email
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

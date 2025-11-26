@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apply for Admission</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>Apply for Admission</h1>
+
+    <p>Please fill this form and our team will contact you.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Submit Application</button>
+    </form>
+</body>
+</html>

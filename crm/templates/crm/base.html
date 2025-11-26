@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CRM Dashboard{% endblock %}</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .active-menu {
+            background: linear-gradient(to right, #4f46e5, #7c3aed, #ec4899);
+            color: white;
+        }
+
+        .sidebar {
+            transition: width 0.3s ease;
+            background: linear-gradient(to bottom right, #6a00f4, #b5179e, #f72585);
+        }
+
+        .collapsed-text {
+            transition: opacity 0.2s ease;
+        }
+
+        .hidden-text {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+<div class="flex h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar w-64 flex flex-col text-white">
+
+        <!-- Top Section -->
+        <div class="p-6 border-b border-white/20 flex justify-between items-center">
+            <div id="logoContainer">
+                <h1 class="text-2xl font-bold">Hassan</h1>
+                <p class="text-sm">Student Management</p>
+            </div>
+
+            <button id="toggleSidebar" class="text-white hover:text-yellow-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- NAVIGATION MENU -->
+        <nav id="navContent" class="flex-1 p-4 space-y-1">
+
+            <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">📊</span>
+                <span class="ml-2">Dashboard</span>
+            </a>
+
+            <a href="{% url 'student_create' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">➕</span>
+                <span class="ml-2">Add Student</span>
+            </a>
+
+            <a href="{% url 'students_list' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">👥</span>
+                <span class="ml-2">Manage Students</span>
+            </a>
+
+            <a href="{% url 'manage_users' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">🧑‍💼</span>
+                <span class="ml-2">Manage Users</span>
+            </a>
+
+            <!-- Email integration -->
+            <a href="{% url 'email_integration' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">📧</span>
+                <span class="ml-2">Email</span>
+            </a>
+
+            <!-- Facebook integration -->
+<!-- Facebook integration -->
+<a href="{% url 'facebook_integration' %}"
+   class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+    <span class="text-xl">📘</span>
+    <span class="ml-2">Facebook Leads</span>
+</a>
+
+
+
+            <a href="{% url 'applications_list' %}" class="flex items-center px-4 py-2 rounded-lg hover:bg-white/20">
+                <span class="text-xl">📁</span>
+                <span class="ml-2">Applications</span>
+            </a>
+
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="mainContent" class="flex-1 p-8 overflow-y-auto transition-all duration-300">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<!-- Sidebar toggle -->
+<script>
+const toggleBtn = document.getElementById('toggleSidebar');
+const sidebar = document.getElementById('sidebar');
+const navContent = document.getElementById('navContent');
+const logoContainer = document.getElementById('logoContainer');
+
+toggleBtn.addEventListener('click', () => {
+    if (sidebar.classList.contains('w-64')) {
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-16');
+        navContent.classList.add('hidden');
+        logoContainer.classList.add('hidden');
+    } else {
+        sidebar.classList.remove('w-16');
+        sidebar.classList.add('w-64');
+        navContent.classList.remove('hidden');
+        logoContainer.classList.remove('hidden');
+    }
+});
+</script>
+
+<!-- Django Messages (Toast Notifications) -->
+{% if messages %}
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3">
+    {% for message in messages %}
+    <div class="toast-item max-w-sm rounded-xl shadow-lg px-4 py-3 bg-white border-l-4
+        {% if 'success' in message.tags %} border-green-500
+        {% elif 'error' in message.tags %} border-red-500
+        {% elif 'warning' in message.tags %} border-yellow-500
+        {% else %} border-blue-500 {% endif %}">
+        <div class="flex justify-between items-start space-x-3">
+            <div>
+                <p class="text-sm font-semibold text-gray-800">
+                    {% if 'success' in message.tags %}Success
+                    {% elif 'error' in message.tags %}Error
+                    {% elif 'warning' in message.tags %}Warning
+                    {% else %}Info{% endif %}
+                </p>
+                <p class="text-sm text-gray-600 mt-1">{{ message }}</p>
+            </div>
+            <button type="button"
+                    class="text-gray-400 hover:text-gray-600"
+                    onclick="this.closest('.toast-item').remove()">
+                ✖
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+setTimeout(function () {
+    const container = document.getElementById('toast-container');
+    if (container) {
+        container.remove();
+    }
+}, 4000);
+</script>
+{% endif %}
+
+</body>
+</html>

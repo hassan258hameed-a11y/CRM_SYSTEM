@@ -1,0 +1,204 @@
+{% extends "crm/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4">
+
+    <!-- Header changes based on create vs edit -->
+    <h2 class="text-3xl font-bold mb-8 text-purple-800">
+        {% if student %}Edit Student{% else %}Add New Student{% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- 🔒 Hidden application_status so form is always valid -->
+        {% if form.application_status %}
+            <input type="hidden"
+                   name="application_status"
+                   value="{{ form.application_status.value|default:'pending' }}">
+        {% endif %}
+        <!-- 🔒 End hidden application_status -->
+
+        <!-- 🔥 ERROR BLOCK -->
+        {% if form.errors %}
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+            <p class="font-semibold mb-1">Please fix the errors below:</p>
+            <ul class="list-disc ml-5">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>
+                            {% if field != '__all__' %}
+                                <strong>{{ field|capfirst }}:</strong>
+                            {% endif %}
+                            {{ error }}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <!-- 🔥 END ERROR BLOCK -->
+
+        <!-- Basic Information -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-6 text-purple-700">Basic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Full Name -->
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Full Name *</label>
+                    <input
+                        type="text"
+                        name="first_name"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="Enter full name"
+                        value="{{ form.first_name.value|default_if_none:'' }}"
+                    >
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Email *</label>
+                    <input
+                        type="email"
+                        name="email"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="student@example.com"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                    >
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Phone Number *</label>
+                    <input
+                        type="text"
+                        name="phone"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="+1234567890"
+                        value="{{ form.phone.value|default_if_none:'' }}"
+                    >
+                </div>
+
+                <!-- Address -->
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Address *</label>
+                    <input
+                        type="text"
+                        name="address"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="Enter full address"
+                    >
+                </div>
+            </div>
+        </div>
+
+                <!-- Enrollment -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-6 text-purple-700">Enrollment</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Enrollment Date</label>
+                    {{ form.enrollment_date }}
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Visa Application -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-6 text-purple-700">Visa Application</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block font-medium mb-2 text-purple-700">Country Applying For *</label>
+                    {{ form.country|as_crispy_field }}
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-2 text-purple-700">Visa Type *</label>
+                    {{ form.visa_type }}
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Preferred Intake *</label>
+                    <input
+                        type="text"
+                        name="preferred_intake"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="e.g. January 2025, Fall 2025"
+                    >
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Course/Program *</label>
+                    <input
+                        type="text"
+                        name="course"
+                        class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                        placeholder="e.g. Master of Computer Science"
+                        value="{{ form.course.value|default_if_none:'' }}"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- University Preferences -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-6 text-purple-700">University Preferences</h3>
+            <div class="space-y-5">
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">First Preference University *</label>
+                    <input type="text" name="uni1"
+                           class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                           placeholder="Enter first preference university">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Second Preference University (Optional)</label>
+                    <input type="text" name="uni2"
+                           class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                           placeholder="Enter second preference university">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1 text-purple-700">Third Preference University (Optional)</label>
+                    <input type="text" name="uni3"
+                           class="w-full rounded-xl border-2 border-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 px-4 py-2"
+                           placeholder="Enter third preference university">
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-6 text-purple-700">Upload Documents</h3>
+            <p class="text-gray-500 mb-4">Supported formats: PDF, JPG, PNG (Max 5MB per file)</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field_name, display_name in docs %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-800">
+                        {{ display_name }}
+                    </span>
+                    <label class="inline-block py-2 px-4 bg-blue-600 text-white text-sm font-semibold rounded-md cursor-pointer hover:bg-blue-700">
+                        Choose File
+                        <input type="file" name="{{ field_name }}" class="hidden">
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300">
+            <h3 class="text-xl font-semibold mb-4 text-purple-700">Additional Notes / Requirements</h3>
+            {{ form.notes }}
+        </div>
+
+        <!-- Save Button -->
+        <button
+            class="w-full py-3 rounded-2xl bg-blue-600 text-white text-xl font-semibold shadow-lg hover:bg-blue-700 transition duration-300">
+            {% if student %}Save Changes{% else %}Save Student{% endif %}
+        </button>
+
+    </form>
+</div>
+{% endblock %}

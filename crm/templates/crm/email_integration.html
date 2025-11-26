@@ -1,0 +1,148 @@
+{% extends "crm/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-10 px-4">
+
+  <div class="max-w-6xl mx-auto space-y-10">
+
+    <!-- Page Title -->
+    <div>
+      <h1 class="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text">
+        Email Integration
+      </h1>
+      <p class="text-gray-500 mt-1">Send bulk emails to students using your CRM.</p>
+    </div>
+
+    <!-- Broadcast Card -->
+    <div class="bg-white shadow-xl rounded-3xl p-8 border border-purple-100">
+
+      <h2 class="text-xl font-bold text-purple-700 mb-6">Send Bulk Email</h2>
+
+      <form method="post" action="{% url 'email_broadcast' %}" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Row 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div>
+            <label class="text-sm font-semibold text-purple-700">Audience</label>
+            <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+              {{ broadcast_form.audience }}
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-600">Course (for “By course”)</label>
+            <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+              {{ broadcast_form.course }}
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-600">Country (for “By country”)</label>
+            <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+              {{ broadcast_form.country }}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Status Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="text-sm text-gray-600">Application Status</label>
+            <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+              {{ broadcast_form.status }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label class="text-sm font-semibold text-purple-700">Subject</label>
+          <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+            {{ broadcast_form.subject }}
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label class="text-sm font-semibold text-purple-700">Message</label>
+          <div class="mt-2 border border-gray-300 rounded-lg px-3 py-2 bg-white">
+            {{ broadcast_form.body }}
+          </div>
+
+          <p class="text-xs text-gray-400 mt-1">
+            Use <code>&#123;&#123; first_name &#125;&#125;</code> to personalize your email.
+          </p>
+        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold shadow-lg hover:opacity-90 active:scale-95 transition">
+          Send Broadcast
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Recent Emails -->
+    <div class="bg-white shadow-xl rounded-3xl p-8 border border-purple-100">
+      <h3 class="text-xl font-bold text-purple-700 mb-6">Recent Emails</h3>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="bg-purple-50 text-purple-700">
+              <th class="px-4 py-2 text-left">Time</th>
+              <th class="px-4 py-2 text-left">Student / Lead</th>
+              <th class="px-4 py-2 text-left">To</th>
+              <th class="px-4 py-2 text-left">Subject</th>
+              <th class="px-4 py-2 text-left">Status</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200">
+            {% for e in recent_emails %}
+            <tr>
+              <td class="px-4 py-3 text-gray-600">{{ e.sent_at|date:"Y-m-d H:i" }}</td>
+
+              <td class="px-4 py-3">
+                {% if e.student %}
+                  <a href="{% url 'student_detail' e.student.id %}" class="text-purple-600 font-medium hover:underline">
+                    {{ e.student.first_name }} {{ e.student.last_name }}
+                  </a>
+                {% elif e.lead %}
+                  Lead #{{ e.lead.id }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+
+              <td class="px-4 py-3 text-gray-700">{{ e.to_email }}</td>
+              <td class="px-4 py-3 text-gray-700">{{ e.subject|truncatechars:40 }}</td>
+
+              <td class="px-4 py-3">
+                {% if e.status == "sent" %}
+                  <span class="text-green-600 font-semibold">Sent</span>
+                {% else %}
+                  <span class="text-red-500 font-semibold">Failed</span>
+                {% endif %}
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="5" class="px-4 py-6 text-center text-gray-400">No emails sent yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

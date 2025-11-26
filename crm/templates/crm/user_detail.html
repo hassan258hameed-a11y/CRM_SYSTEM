@@ -1,0 +1,71 @@
+{% extends "crm/base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4">
+
+    <h2 class="text-3xl font-bold mb-8 text-purple-800">User Details</h2>
+
+    <div class="bg-white shadow-lg rounded-2xl p-6 border border-purple-300 space-y-6">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xl font-semibold">
+                {{ user_obj.get_full_name|default:user_obj.username|slice:"1"|upper }}
+            </div>
+            <div>
+                <p class="text-lg font-semibold text-gray-800">
+                    {{ user_obj.get_full_name|default:user_obj.username }}
+                </p>
+                <p class="text-sm text-gray-500">{{ user_obj.email|default:"no-email@example.com" }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="text-gray-500">Username</p>
+                <p class="font-medium text-gray-800">{{ user_obj.username }}</p>
+            </div>
+            <div>
+                <p class="text-gray-500">Role</p>
+                <p class="font-medium text-gray-800">{{ role_label }}</p>
+            </div>
+            <div>
+                <p class="text-gray-500">Status</p>
+                {% if user_obj.is_active %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                        ACTIVE
+                    </span>
+                {% else %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                        <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                        INACTIVE
+                    </span>
+                {% endif %}
+            </div>
+            <div>
+                <p class="text-gray-500">Last Login</p>
+                <p class="font-medium text-gray-800">
+                    {% if user_obj.last_login %}
+                        {{ user_obj.last_login|date:"M d, Y H:i" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="flex space-x-3">
+            <a href="{% url 'manage_users' %}"
+               class="px-5 py-2 rounded-2xl border border-gray-300 text-gray-700 text-sm hover:bg-gray-50">
+                Back to Users
+            </a>
+
+            {% if request.user.is_superuser %}
+            <a href="{% url 'user_edit' user_obj.id %}"
+               class="px-5 py-2 rounded-2xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700">
+                Edit User
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
