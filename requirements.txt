@@ -6,5 +6,5 @@ requests==2.32.3
 gunicorn==21.2.0
 pandas
 openpyxl
-freeze
-
+django-crispy-forms==2.3
+crispy-bootstrap5==0.7
